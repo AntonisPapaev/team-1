@@ -5,7 +5,7 @@ import rclpy
 from rclpy.node import Node
 from sensor_msgs.msg import CompressedImage
 from opencv.opencv_functions import Image, find_latest_image
-
+from opencv.color_hsv import hsv_ranges
 
 class ImageSaver(Node):
     def __init__(self):
