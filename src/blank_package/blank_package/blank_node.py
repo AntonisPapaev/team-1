@@ -9,8 +9,9 @@ from opencv.color_hsv import hsv_ranges
 
 class ImageSaver(Node):
     def __init__(self):
-        self.get_logger().info("in init")
         super().__init__('image_saver')
+
+        self.get_logger().info("in init")
         self.output_dir = "opencv/images/"
         os.makedirs(self.output_dir, exist_ok=True)
         self.vehicle_name = os.getenv('VEHICLE_NAME')
