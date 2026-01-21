@@ -106,6 +106,8 @@ class Image:
         pred_x2_array = []
         # print(h1, h2)
         # print(lines)
+        if lines is None:
+            return -1, -1, -1, -1, -1, -1
         for i in lines[:, 0]:
             # print(i)
             x1, y1, x2, y2 = i[0], i[1], i[2], i[3]
@@ -134,6 +136,9 @@ class Image:
 
     def find_error_from_middle(self):
         x1, x2, y1, y2, height, width = self.find_mid_black_line()
+        if x1 == -1 and height == -1:
+            print("No line seen")
+            return -1
         middle = width / 2
         standard_deviation = 0
         # print(x1, x2, y1, y2, height, width)
