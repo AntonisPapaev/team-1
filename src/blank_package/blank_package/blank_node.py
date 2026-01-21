@@ -10,6 +10,8 @@ from opencv.color_hsv import hsv_ranges
 class ImageSaver(Node):
     def __init__(self):
         super().__init__('image_saver')
+
+        self.get_logger().info("in init")
         self.output_dir = "opencv/images/"
         os.makedirs(self.output_dir, exist_ok=True)
         self.vehicle_name = os.getenv('VEHICLE_NAME')
@@ -17,6 +19,7 @@ class ImageSaver(Node):
         self.create_subscription(CompressedImage, f'/opencv/images', self.save_image, 10)
 
     def save_image(self, msg):
+        self.get_logger().info("in save_image")
         if self.counter % 30 != 0:
             self.counter += 1
             return
@@ -28,12 +31,13 @@ class ImageSaver(Node):
         image = Image(image_path)
         error = image.find_error_from_middle()
         if error < 10:
-            print("LED on")
+            self.get_logger().info("LED on")
         else:
-            print("LED off")
+            self.get_logger().info("LED off")
 
 
 def main():
+    print("in main")
     rclpy.init()
     image_saver = ImageSaver()
     rclpy.spin(image_saver)
