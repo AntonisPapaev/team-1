@@ -2,8 +2,25 @@ import cv2
 import os
 import re
 import numpy as np
-from opencv.color_hsv import hsv_ranges
-# import matplotlib.pyplot as plt
+from color_hsv import hsv_ranges
+import matplotlib.pyplot as plt
+
+
+def find_latest_image():
+    folder = "images"
+    pattern = re.compile(r"(\d+)\.jpg")
+
+    max_num = -1
+    max_file = None
+
+    for filename in os.listdir(folder):
+        match = pattern.fullmatch(filename)
+        if match:
+            num = int(match.group(1))
+            if num > max_num:
+                max_num = num
+                max_file = filename
+    return f"images/{max_file}"
 
 
 class Image:
@@ -124,38 +141,21 @@ class Image:
             print("No line seen")
             return -1
         middle = width / 2
-        standard_deviation = 0
-        # print(x1, x2, y1, y2, height, width)
-        # print(left_boundary, right_boundary)
+        signed_deviation = 0
         for i in range(10):
-            curr_y = height // 10 * i
-            curr_x = (curr_y - y1) / (y2 - y1) / (x2 - x1) + x1
-            standard_deviation += (curr_x - middle) ** 2
-            # print(curr_x)
-        standard_deviation /= 10
-        standard_deviation = standard_deviation ** 0.5
-        percentage_deviation = standard_deviation / width * 100
-        # print(percentage_deviation)
-        if percentage_deviation < 10:
+            curr_y = height * i / 10
+            # line equation: x = x1 + (y - y1) * (x2 - x1) / (y2 - y1)
+            curr_x = x1 + (curr_y - y1) * (x2 - x1) / (y2 - y1)
+            signed_deviation += (curr_x - middle)
+        signed_deviation /= 10  # mean signed deviation
+        percentage_deviation = signed_deviation / width * 100
+        if abs(percentage_deviation) < 10:
             print("Going straight")
+        elif percentage_deviation > 0:
+            print(f"{percentage_deviation:.2f}% to the right of middle")
         else:
-            print(f"{percentage_deviation}% away from middle")
-        return standard_deviation
-
-
-def find_latest_image():
-    folder = "images"
-    pattern = re.compile(r"image(\d+)\.jpg")
-    max_num = -1
-    max_file = None
-    for filename in os.listdir(folder):
-        match = pattern.fullmatch(filename)
-        if match:
-            num = int(match.group(1))
-            if num > max_num:
-                max_num = num
-                max_file = filename
-    return f"images/{max_file}"
+            print(f"{abs(percentage_deviation):.2f}% to the left of middle")
+        return signed_deviation
 
 # def main():
 #     # file_path = find_latest_image()
