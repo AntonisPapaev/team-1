@@ -12,7 +12,7 @@ class ImageSaver(Node):
         super().__init__('image_saver')
 
         self.get_logger().info("in init")
-        self.output_dir = "/workspace/images/"
+        self.output_dir = "/workspace/src/blank_package/include/opencv/images/"
         os.makedirs(self.output_dir, exist_ok=True)
         self.vehicle_name = os.getenv('VEHICLE_NAME')
         self.counter = 0
