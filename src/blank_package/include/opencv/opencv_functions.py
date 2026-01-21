@@ -2,7 +2,7 @@ import cv2
 import os
 import re
 import numpy as np
-from color_hsv import hsv_ranges
+from opencv.color_hsv import hsv_ranges
 import matplotlib.pyplot as plt
 
 
