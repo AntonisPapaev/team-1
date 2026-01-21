@@ -3,6 +3,7 @@ import os
 import rclpy
 from rclpy.node import Node
 
+
 # Fill in something for msg type imports
 # from duckietown_msgs.msg import SOMETHING
 # from std_msgs.msg import SOMETHING
@@ -10,10 +11,10 @@ from rclpy.node import Node
 class SkeletonNode(Node):
     def __init__(self):
         super().__init__('blank_node')
-        #Create publishers and subscribers in init, use callback
+        # Create publishers and subscribers in init, use callback
         pass
-    
-    #Define callback functions here
+
+    # Define callback functions here
 
 
 def main():
