@@ -12,7 +12,7 @@ from duckietown_msgs.msg import LEDPattern
 from std_msgs.msg import ColorRGBA
 import numpy as np
 
-
+DEVIATION = 0
 class ImageSaver(Node):
     def __init__(self):
         super().__init__('image_saver')
@@ -45,7 +45,7 @@ class ImageSaver(Node):
         # img = cv2.imread(image_path)
         image = Image(img)
         error, deviation = image.find_error_from_middle()
-
+        DEVIATION = deviation
         # LEDPattern is a custom Duckietown Message
         msg = LEDPattern()
     
