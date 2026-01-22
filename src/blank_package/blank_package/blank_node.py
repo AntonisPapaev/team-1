@@ -69,6 +69,7 @@ class ImageSaver(Node):
                         ColorRGBA(r=1.0, g=0.0, b=0.0, a=1.0), # front right
                         ColorRGBA(r=0.0, g=0.0, b=0.0, a=1.0), # emt
                         ColorRGBA(r=0.0, g=0.0, b=0.0, a=1.0)] # back left
+        self.publisher.publish(msg)
         self.counter += 1
 
 
