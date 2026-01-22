@@ -6,9 +6,7 @@ from rclpy.node import Node
 from std_msgs.msg import String, Header
 from duckietown_msgs.msg import WheelsCmdStamped
 from rclpy.time import Duration
-target_directory = os.path.abspath('././././src/blank_package/blank_package')
-sys.path_append(target_directory)
-import blank_node import DEVIATION as error
+from ....src.blank_package.blank_package.blank_node import DEVIATION as error
 
 
 class RobotController(Node):
@@ -47,8 +45,6 @@ class RobotController(Node):
 
         if abs(error) < 15:
             self.target_left, self.target_right = 0.5, 0.48
-        elif command == 'b':
-            self.target_left, self.target_right = -0.5, -0.48
         elif error < 0:
             self.target_left, self.target_right = 0.0, 0.25
         else:
