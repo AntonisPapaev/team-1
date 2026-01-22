@@ -51,7 +51,7 @@ class RobotController(Node):
         self.last_cmd_time = self.get_clock().now()
 
         if command == 'f':
-            self.target_left, self.target_right = 0.5, 0.5
+            self.target_left, self.target_right = 0.5, 0.45
         elif command == 'b':
             self.target_left, self.target_right = -0.5, -0.5
         elif command == 'l':
