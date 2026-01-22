@@ -49,7 +49,7 @@ class ImageSaver(Node):
         image = Image(img)
         error, deviation = image.find_error_from_middle()
         global DEVIATION
-        DEVIATION = deviation
+        DEVIATION = error
         # LEDPattern is a custom Duckietown Message
         msg = LEDPattern()
 
