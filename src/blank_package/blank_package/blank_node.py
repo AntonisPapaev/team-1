@@ -8,6 +8,7 @@ from rclpy.node import Node
 from sensor_msgs.msg import CompressedImage
 from opencv.opencv_functions import Image, find_latest_image
 from opencv.color_hsv import hsv_ranges
+from duckietown_msgs.msg import LEDPattern
 import numpy as np
 
 
@@ -22,6 +23,7 @@ class ImageSaver(Node):
         self.vehicle_name = os.getenv('VEHICLE_NAME')
         self.counter = 0
         self.create_subscription(CompressedImage, f'/{self.vehicle_name}/image/compressed', self.save_image, 10)
+        self.publisher = self.create_publisher(LEDPattern, f'/{self.vehicle_name}/led_pattern', 1)
 
     def save_image(self, msg):
         # self.get_logger().info("in save_image")
@@ -42,8 +44,7 @@ class ImageSaver(Node):
         # img = cv2.imread(image_path)
         image = Image(img)
         error = image.find_error_from_middle()
-        
-    def publish_pattern(self):
+
         # LEDPattern is a custom Duckietown Message
         msg = LEDPattern()
     
@@ -55,14 +56,14 @@ class ImageSaver(Node):
                         ColorRGBA(r=0.0, g=0.0, b=0.0, a=1.0), # emt
                         ColorRGBA(r=0.0, g=0.0, b=0.0, a=1.0)] # back left
         elif abs(error) > 0:
-            self.get_logger().info("right LED off")
+            self.get_logger().info("right LED on")
             msg.rgb_vals = [ColorRGBA(r=0.0, g=0.0, b=1.0, a=1.0), # front left
                         ColorRGBA(r=0.0, g=0.0, b=0.0, a=1.0), # back right
                         ColorRGBA(r=0.0, g=0.0, b=0.0, a=1.0), # front right
                         ColorRGBA(r=0.0, g=0.0, b=0.0, a=1.0), # emt
                         ColorRGBA(r=0.0, g=0.0, b=1.0, a=1.0)] # back left
         else:
-            self.get_logger().info("left LED off")
+            self.get_logger().info("left LED on")
             msg.rgb_vals = [ColorRGBA(r=0.0, g=0.0, b=0.0, a=1.0), # front left
                         ColorRGBA(r=1.0, g=0.0, b=0.0, a=1.0), # back right
                         ColorRGBA(r=1.0, g=0.0, b=0.0, a=1.0), # front right
