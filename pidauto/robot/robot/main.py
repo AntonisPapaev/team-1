@@ -44,10 +44,13 @@ class RobotController(Node):
         self.last_cmd_time = self.get_clock().now()
 
         if abs(error) < 15:
+            self.get_logger().info("straight")
             self.target_left, self.target_right = 0.5, 0.48
         elif error < 0:
+            self.get_logger().info("right")
             self.target_left, self.target_right = 0.0, 0.25
         else:
+            self.get_logger().info("left")
             self.target_left, self.target_right = 0.25, 0.0
 
     def run_wheels(self, frame_id, vel_left, vel_right):
