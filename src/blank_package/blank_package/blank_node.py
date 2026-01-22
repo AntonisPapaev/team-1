@@ -9,6 +9,7 @@ from sensor_msgs.msg import CompressedImage
 from opencv.opencv_functions import Image, find_latest_image
 from opencv.color_hsv import hsv_ranges
 from duckietown_msgs.msg import LEDPattern
+from std_msgs.msg import ColorRGBA
 import numpy as np
 
 
