@@ -18,4 +18,10 @@ setup(
     maintainer_email='lankford@mit.edu, ilia.nechaev@jetbrains.com',
     description='Move Duckiebot forward until it detects an object within 0.2 meters',
     license='GPLv3',
+
+    entry_points={
+        'console_scripts': [
+            'tof_node = tof_reader.tof_node:main',
+        ],
+    },
 )

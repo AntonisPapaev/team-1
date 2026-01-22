@@ -147,26 +147,75 @@ class Image:
         return mid_x1, mid_x2, h1, h2, height, width
 
     def find_error_from_middle(self):
-        x1, x2, y1, y2, height, width = self.find_mid_black_line()
-        if x1 == -1 and height == -1:
-            print("No line seen")
-            return -1, -1
-        middle = width / 2
-        signed_deviation = 0
-        for i in range(10):
-            curr_y = height * i / 10
-            # line equation: x = x1 + (y - y1) * (x2 - x1) / (y2 - y1)
-            curr_x = x1 + (curr_y - y1) * (x2 - x1) / (y2 - y1)
-            signed_deviation += (curr_x - middle)
-        signed_deviation /= 10  # mean signed deviation
-        percentage_deviation = signed_deviation / width * 100
-        if abs(percentage_deviation) < 15:
-            print("Going straight")
-        elif percentage_deviation > 0:
-            print(f"{percentage_deviation:.2f}% to the right of middle")
+
+        img = self.img 
+        if img is None:
+            return 0.0, False, 0
+
+        h, w = img.shape[:2]
+
+        # ROI: bottom half (works well for ground plane)
+        roi = img[h // 2 : h, :]
+
+        # Convert to HSV
+        hsv = cv2.cvtColor(roi, cv2.COLOR_BGR2HSV)
+
+        lower_black = np.array([0, 0, 0])
+        upper_black = np.array([179, 190, 90]) 
+        mask = cv2.inRange(hsv, lower_black, upper_black)
+
+        # Cleans noise
+        kernel = np.ones((5, 5), np.uint8)
+        mask = cv2.morphologyEx(mask, cv2.MORPH_OPEN, kernel)
+        mask = cv2.morphologyEx(mask, cv2.MORPH_CLOSE, kernel)
+
+        black_pixels = int(cv2.countNonZero(mask))
+        if black_pixels == 0:
+            return 0.0, False, 0
+
+        # Filtering
+        contours, _ = cv2.findContours(mask, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
+        if not contours:
+            return 0.0, False, black_pixels
+
+        # Bigest lines
+        contours = sorted(contours, key=cv2.contourArea, reverse=True)
+
+        # Take up to 2 largest lines
+        top = contours[:2]
+
+        centers_x = []
+        for c in top:
+            area = cv2.contourArea(c)
+            if area < 150:  # avoid noise
+                continue
+            x, y, cw, ch = cv2.boundingRect(c)
+            centers_x.append(x + cw / 2.0)
+
+        if len(centers_x) == 0:
+            return 0.0, False, black_pixels
+
+        if len(centers_x) >= 2:
+            centers_x.sort()
+            lane_center_x = (centers_x[0] + centers_x[1]) / 2.0
+            valid = True
         else:
-            print(f"{abs(percentage_deviation):.2f}% to the left of middle")
-        return percentage_deviation, signed_deviation
+            lane_center_x = centers_x[0]
+            valid = True # Filter to allow 1 line
+
+        cx = w / 2.0
+        pixel_error = (lane_center_x - cx)
+
+        # Normalize to [-1, +1]
+        norm_error = float(pixel_error / cx)
+
+        # Hard clamp
+        if norm_error < -1.0:
+            norm_error = -1.0
+        elif norm_error > 1.0:
+            norm_error = 1.0
+
+        return norm_error, valid, black_pixels
 
 # def main():
 #     # file_path = find_latest_image()
