@@ -42,13 +42,32 @@ class ImageSaver(Node):
         # img = cv2.imread(image_path)
         image = Image(img)
         error = image.find_error_from_middle()
+        
+    def publish_pattern(self):
+        # LEDPattern is a custom Duckietown Message
+        msg = LEDPattern()
+    
         if abs(error) < 10:
             self.get_logger().info("LED off")
-
-        elif error > 0:
-            self.get_logger().info("right LED on")
+            msg.rgb_vals = [ColorRGBA(r=0.0, g=0.0, b=0.0, a=1.0), # front left
+                        ColorRGBA(r=0.0, g=0.0, b=0.0, a=1.0), # back right
+                        ColorRGBA(r=0.0, g=0.0, b=0.0, a=1.0), # front right
+                        ColorRGBA(r=0.0, g=0.0, b=0.0, a=1.0), # emt
+                        ColorRGBA(r=0.0, g=0.0, b=0.0, a=1.0)] # back left
+        elif abs(error) > 0:
+            self.get_logger().info("right LED off")
+            msg.rgb_vals = [ColorRGBA(r=0.0, g=0.0, b=1.0, a=1.0), # front left
+                        ColorRGBA(r=0.0, g=0.0, b=0.0, a=1.0), # back right
+                        ColorRGBA(r=0.0, g=0.0, b=0.0, a=1.0), # front right
+                        ColorRGBA(r=0.0, g=0.0, b=0.0, a=1.0), # emt
+                        ColorRGBA(r=0.0, g=0.0, b=1.0, a=1.0)] # back left
         else:
-            self.get_logger().info("left LED on")
+            self.get_logger().info("left LED off")
+            msg.rgb_vals = [ColorRGBA(r=0.0, g=0.0, b=0.0, a=1.0), # front left
+                        ColorRGBA(r=1.0, g=0.0, b=0.0, a=1.0), # back right
+                        ColorRGBA(r=1.0, g=0.0, b=0.0, a=1.0), # front right
+                        ColorRGBA(r=0.0, g=0.0, b=0.0, a=1.0), # emt
+                        ColorRGBA(r=0.0, g=0.0, b=0.0, a=1.0)] # back left
         self.counter += 1
 
 
