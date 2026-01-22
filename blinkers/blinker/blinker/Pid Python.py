@@ -2,24 +2,15 @@
 
 import numpy as np
 import time
+import matplotlib.pyplot as plt
 from opencv_functions import Image
-import os
-import sys
-import tty
-import termios
-import select
-import rclpy
-from rclpy.node import Node
-from std_msgs.msg import String, Header
-from duckietown_msgs.msg import WheelsCmdStamped
-from rclpy.time import Duration
 
 
 img = Image()
 img.find_error_from_middle
 
 
-def pid_controller(kp, ki, kd, previous_error, integral, dt, image_obj):
+def pid_controller(setpoint, pv, kp, ki, kd, previous_error, integral, dt, image_obj):
     percentage_error, error = image_obj.find_error_from_middle() # PV is the real-time measured value of the system parameter i want to control, (In my case this will be distance from center i think) here it is subtracting the Process Variable from the desired set point to find the real-time error
     integral += error * dt # Integral here is adding the errors every time step (i think) the time step is represented by dt. As the integral term accumulates over time, the 'urge' to return the error to zero increases.
     derivative = (error - previous_error) / dt # Looks like acceleration formula!! rate of change of error
@@ -36,8 +27,6 @@ def main():
 
     time_steps = [] # Stores time points at each iteration
     control_values = [] # Stores control output at each time step
-
-if 
 
     
 
