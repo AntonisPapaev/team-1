@@ -160,13 +160,13 @@ class Image:
             signed_deviation += (curr_x - middle)
         signed_deviation /= 10  # mean signed deviation
         percentage_deviation = signed_deviation / width * 100
-        if abs(percentage_deviation) < 10:
+        if abs(percentage_deviation) < 15:
             print("Going straight")
         elif percentage_deviation > 0:
             print(f"{percentage_deviation:.2f}% to the right of middle")
         else:
             print(f"{abs(percentage_deviation):.2f}% to the left of middle")
-        return signed_deviation
+        return signed_deviation, percentage_deviation
 
 # def main():
 #     # file_path = find_latest_image()

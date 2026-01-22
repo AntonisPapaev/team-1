@@ -44,19 +44,19 @@ class ImageSaver(Node):
         # image_path = find_latest_image()
         # img = cv2.imread(image_path)
         image = Image(img)
-        error = image.find_error_from_middle()
+        error, deviation = image.find_error_from_middle()
 
         # LEDPattern is a custom Duckietown Message
         msg = LEDPattern()
     
-        if abs(error) < 10:
+        if abs(error) < 15:
             self.get_logger().info("LED off")
             msg.rgb_vals = [ColorRGBA(r=0.0, g=0.0, b=0.0, a=1.0), # front left
                         ColorRGBA(r=0.0, g=0.0, b=0.0, a=1.0), # back right
                         ColorRGBA(r=0.0, g=0.0, b=0.0, a=1.0), # front right
                         ColorRGBA(r=0.0, g=0.0, b=0.0, a=1.0), # emt
                         ColorRGBA(r=0.0, g=0.0, b=0.0, a=1.0)] # back left
-        elif abs(error) > 0:
+        elif error > 0:
             self.get_logger().info("right LED on")
             msg.rgb_vals = [ColorRGBA(r=0.0, g=0.0, b=1.0, a=1.0), # front left
                         ColorRGBA(r=0.0, g=0.0, b=0.0, a=1.0), # back right
