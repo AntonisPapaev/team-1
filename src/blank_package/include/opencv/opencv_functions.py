@@ -166,7 +166,7 @@ class Image:
             print(f"{percentage_deviation:.2f}% to the right of middle")
         else:
             print(f"{abs(percentage_deviation):.2f}% to the left of middle")
-        return signed_deviation, percentage_deviation
+        return percentage_deviation, signed_deviation
 
 # def main():
 #     # file_path = find_latest_image()
