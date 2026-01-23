@@ -50,11 +50,6 @@ class TofNode(Node):
             self.prev_time = self.get_clock().now()
             return
 
-        # Checks if lane data updated recently
-        age = (self.get_clock().now() - self.last_lane_time).nanoseconds / 1e9
-        if age > 0.5:
-            self.lane_valid = False
-
         if not self.lane_valid:
             if self.lost_lane_behavior == 'search':
                 base = 0.08
