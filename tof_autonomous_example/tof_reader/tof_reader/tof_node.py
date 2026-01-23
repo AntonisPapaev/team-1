@@ -21,6 +21,7 @@ class TofNode(Node):
 
         self.create_subscription(Float32, f'/{self.vehicle_name}/lane_error', self.lane_error_cb, 10)
         self.create_subscription(Bool, f'/{self.vehicle_name}/lane_valid', self.lane_valid_cb, 10)
+        self.lost_lane_behavior = self.declare_parameter('lost_lane_behavior', 'search').value
 
         self.declare_parameter('base_speed', 0.20)
         self.declare_parameter('kp', 0.45)
