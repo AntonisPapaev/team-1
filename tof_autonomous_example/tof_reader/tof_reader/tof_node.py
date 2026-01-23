@@ -3,9 +3,9 @@ import os
 import rclpy
 from rclpy.node import Node
 
-from std_msgs.msg import Header
+from std_msgs.msg import Header, Float32, Bool
 from sensor_msgs.msg import Range
-from duckietown_msgs.msg import WheelsCmdStamped, Float32, Bool
+from duckietown_msgs.msg import WheelsCmdStamped
 
 
 class TofNode(Node):
