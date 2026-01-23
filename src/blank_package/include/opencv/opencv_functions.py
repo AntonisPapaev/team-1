@@ -148,75 +148,84 @@ class Image:
 
     def find_error_from_middle(self):
 
-        img = self.img 
+        img = self.img
         if img is None:
             return 0.0, False, 0
 
         h, w = img.shape[:2]
 
-        # ROI: bottom half (works well for ground plane)
+        # ROI: bottom half
         roi = img[h // 2 : h, :]
 
-        # Convert to HSV
         hsv = cv2.cvtColor(roi, cv2.COLOR_BGR2HSV)
 
+        # Black threshold (may need small tuning per lighting)
         lower_black = np.array([0, 0, 0])
-        upper_black = np.array([179, 190, 90]) 
+        upper_black = np.array([179, 190, 90])
         mask = cv2.inRange(hsv, lower_black, upper_black)
 
-        # Cleans noise
+        # Clean noise (keep light – too much close merges blobs)
         kernel = np.ones((5, 5), np.uint8)
-        mask = cv2.morphologyEx(mask, cv2.MORPH_OPEN, kernel)
-        mask = cv2.morphologyEx(mask, cv2.MORPH_CLOSE, kernel)
+        mask = cv2.morphologyEx(mask, cv2.MORPH_OPEN, kernel, iterations=1)
+        mask = cv2.morphologyEx(mask, cv2.MORPH_CLOSE, kernel, iterations=1)
 
         black_pixels = int(cv2.countNonZero(mask))
         if black_pixels == 0:
-            return 0.0, False, 0
+            return 0.0, False, black_pixels
 
-        # Filtering
         contours, _ = cv2.findContours(mask, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
         if not contours:
             return 0.0, False, black_pixels
 
-        # Bigest lines
         contours = sorted(contours, key=cv2.contourArea, reverse=True)
+        top = contours[:6]  # try a few, filtering will pick the true lines
 
-        # Take up to 2 largest lines
-        top = contours[:2]
+        line_xs = []
+        roi_h, roi_w = mask.shape[:2]
+        y_pick = int(roi_h * 0.85)
 
-        centers_x = []
         for c in top:
             area = cv2.contourArea(c)
-            if area < 150:  # avoid noise
+            if area < 200:
                 continue
-            x, y, cw, ch = cv2.boundingRect(c)
-            centers_x.append(x + cw / 2.0)
 
-        if len(centers_x) == 0:
+            x, y, cw, ch = cv2.boundingRect(c)
+
+            # reject blobs / shadows / road
+            if ch < 25:
+                continue
+            if cw > 80:
+                continue
+            if (ch / float(cw + 1e-6)) < 1.2:
+                continue
+
+            pts = c[:, 0, :]
+            ys = pts[:, 1]
+            xs = pts[:, 0]
+
+            bottom_xs = xs[ys >= y_pick]
+            if bottom_xs.size == 0:
+                continue
+
+            line_xs.append(float(np.mean(bottom_xs)))
+
+        if len(line_xs) < 2:
             return 0.0, False, black_pixels
 
-        if len(centers_x) >= 2:
-            centers_x.sort()
-            lane_center_x = (centers_x[0] + centers_x[1]) / 2.0
-            valid = True
-        else:
-            lane_center_x = centers_x[0]
-            valid = True # Filter to allow 1 line
+        line_xs.sort()
+        lane_center_x = (line_xs[0] + line_xs[1]) / 2.0
 
-        cx = w / 2.0
-        pixel_error = (lane_center_x - cx)
-
-        # Normalize to [-1, +1]
+        cx = roi_w / 2.0
+        pixel_error = lane_center_x - cx
         norm_error = float(pixel_error / cx)
 
-        # Hard clamp
+        # clamp
         if norm_error < -1.0:
             norm_error = -1.0
         elif norm_error > 1.0:
             norm_error = 1.0
 
-        return norm_error, valid, black_pixels
-
+        return norm_error, True, black_pixels
 # def main():
 #     # file_path = find_latest_image()
 #     img = cv2.imread("images/image22.png")
