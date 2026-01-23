@@ -47,10 +47,16 @@ class TofNode(Node):
         self.integral = 0.0
         self.prev_time = self.get_clock().now()
 
+        self.get_logger().info(f"Subscribing to: /{self.vehicle_name}/range, /{self.vehicle_name}/lane_error, /{self.vehicle_name}/lane_valid")
+
+        self.get_logger().info("INNIT DONE")
+
     def check_range(self, msg: Range):
+        self.get_logger().info("in check range")
         distance = float(msg.range)
 
         if distance < self.tof_stop_distance:
+            self.get_logger().info("in if dist<self.tof")
             self.stop()
             self.prev_error = 0.0
             self.integral = 0.0
@@ -109,6 +115,7 @@ class TofNode(Node):
         self.lane_error = float(msg.data)
 
     def lane_valid_cb(self, msg: Bool):
+        self.get_logger().info(f"lane_valid cb: {msg.data}")
         self.last_lane_time = self.get_clock().now()
         self.lane_valid = bool(msg.data)
 
